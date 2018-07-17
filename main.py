@@ -1,3 +1,5 @@
+import traceback
+
 import telebot
 from telebot import types
 
@@ -64,5 +66,8 @@ def callback_inline(call):
 
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
-
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception:
+            traceback.print_exc()
