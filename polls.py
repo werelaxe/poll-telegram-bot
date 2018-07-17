@@ -1,8 +1,9 @@
 class Poll:
-    def __init__(self, suggestions):
+    def __init__(self, suggestions, title_prefix='Опрос: '):
         self.suggestions = suggestions
         self.nickname_to_choice = {}
         self.choice_to_nicknames = dict((s, []) for s in suggestions)
+        self.title_prefix = title_prefix
 
     def vote(self, nickname, choice):
         if choice not in self.suggestions:
@@ -40,16 +41,16 @@ class Poll:
 
     def get_title(self):
         choices = self.suggestions
-        return 'Опрос: {} или {}?'.format(', '.join(choices[:-1]), choices[-1])
+        return '{}{} или {}?'.format(self.title_prefix, ', '.join(choices[:-1]), choices[-1])
 
 
 def create_new_dinner_time_poll():
-    return Poll(['13:00', '13:30', '14:00', '14:30', '15:00'])
+    return Poll(['13:00', '13:30', '14:00', '14:30', '15:00'], "Когда на обед? В ")
 
 
 def create_new_dinner_place_poll():
-    return Poll(['Тревелерс', 'Рататуй', 'Ратскеллер'])
+    return Poll(['Тревелерс', 'Рататуй', 'Ратскеллер'], 'Куда на обед? В ')
 
 
 def create_new_breakfast_time_poll():
-    return Poll(['9:00', '9:30', '10:00', '10:30'])
+    return Poll(['9:00', '9:30', '10:00', '10:30'], 'Когда на завтрак? В ')
