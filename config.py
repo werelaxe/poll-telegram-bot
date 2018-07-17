@@ -1,1 +1,2 @@
 BOT_TOKEN = 'YOUR TOKEN'
+POLLS_STORAGE_DIR = 'polls_storage'

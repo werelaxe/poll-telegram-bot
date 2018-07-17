@@ -3,12 +3,13 @@ import traceback
 import telebot
 from telebot import types
 
-from config import BOT_TOKEN
+from config import BOT_TOKEN, POLLS_STORAGE_DIR
 from message_parser import get_suggestions
 from polls import Poll
+from storage import Storage
 
 bot = telebot.TeleBot(BOT_TOKEN)
-polls = {}
+polls_storage = Storage(POLLS_STORAGE_DIR)
 
 
 def generate_markup(message_hash, suggestions):
@@ -35,7 +36,7 @@ def any_msg(message):
         return
     new_poll = Poll(suggestions)
 
-    polls[str(hash(message))] = new_poll
+    polls_storage[str(hash(message))] = new_poll
     stat = new_poll.get_results()[1]
     bot.send_message(
         chat_id=message.chat.id,
@@ -52,7 +53,7 @@ def callback_inline(call):
     if call.message:
         poll_hash, suggestion = call.data.split(',')
         nickname = call.from_user.username
-        poll = polls.get(poll_hash, None)
+        poll = polls_storage.get(poll_hash)
         if poll is None:
             return
         poll.vote(nickname, suggestion.split()[0])
