@@ -41,3 +41,15 @@ class Poll:
     def get_title(self):
         choices = self.suggestions
         return 'Опрос: {} или {}?'.format(', '.join(choices[:-1]), choices[-1])
+
+
+def create_new_dinner_time_poll():
+    return Poll(['13:00', '13:30', '14:00', '14:30', '15:00'])
+
+
+def create_new_dinner_place_poll():
+    return Poll(['Тревелерс', 'Рататуй', 'Ратскеллер'])
+
+
+def create_new_breakfast_time_poll():
+    return Poll(['9:00', '9:30', '10:00', '10:30'])

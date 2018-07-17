@@ -4,8 +4,9 @@ import telebot
 from telebot import types
 
 from config import BOT_TOKEN, POLLS_STORAGE_DIR
-from message_parser import get_suggestions
-from polls import Poll
+from message_parser import get_suggestions_in_common_case, COMMON_TRIGGER_PATTERN, BREAKFAST_TIME_TRIGGER_PATTERN,\
+    DINNER_PLACE_TRIGGER_PATTERN, DINNER_TIME_TRIGGER_PATTERN
+from polls import Poll, create_new_breakfast_time_poll, create_new_dinner_place_poll, create_new_dinner_time_poll
 from storage import Storage
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -23,19 +24,7 @@ def generate_markup(message_hash, suggestions):
     return keyboard
 
 
-@bot.message_handler(content_types=["text"])
-def any_msg(message):
-    if message.chat.id > 0:
-        bot.send_message(message.chat.id, 'Я не делаю опросы в одиночных чатах.')
-        return
-    print(message.text)
-    suggestions = get_suggestions(message.text)
-    if suggestions is None:
-        return
-    if len(suggestions) <= 1:
-        return
-    new_poll = Poll(suggestions)
-
+def send_answer_by_poll(message, new_poll):
     polls_storage[str(hash(message))] = new_poll
     stat = new_poll.get_results()[1]
     bot.send_message(
@@ -46,6 +35,35 @@ def any_msg(message):
             ['{} - {}'.format(e, stat[e]) for e in sorted(new_poll.suggestions)]
         )
     )
+
+
+@bot.message_handler(content_types=['text'], regexp=COMMON_TRIGGER_PATTERN)
+def common_case(message):
+    if message.chat.id > 0:
+        bot.send_message(message.chat.id, 'Я не делаю опросы в одиночных чатах.')
+        return
+    print(message.text)
+    suggestions = get_suggestions_in_common_case(message.text)
+    if suggestions is None:
+        return
+    if len(suggestions) <= 1:
+        return
+    send_answer_by_poll(message, Poll(suggestions))
+
+
+@bot.message_handler(content_types=['text'], regexp=DINNER_TIME_TRIGGER_PATTERN)
+def dinner_time_case(message):
+    send_answer_by_poll(message, create_new_dinner_time_poll())
+
+
+@bot.message_handler(content_types=['text'], regexp=DINNER_PLACE_TRIGGER_PATTERN)
+def dinner_place_case(message):
+    send_answer_by_poll(message, create_new_dinner_place_poll())
+
+
+@bot.message_handler(content_types=['text'], regexp=BREAKFAST_TIME_TRIGGER_PATTERN)
+def breakfast_time_case(message):
+    send_answer_by_poll(message, create_new_breakfast_time_poll())
 
 
 @bot.callback_query_handler(func=lambda call: True)
