@@ -40,6 +40,11 @@ def send_answer_by_poll(message, new_poll):
     )
 
 
+@bot.message_handler(commands=['ping'])
+def ping(message):
+    logging.info('ping from {} in chat {}'.format(message.from_user.username, message.chat.title))
+
+
 @bot.message_handler(content_types=['text'], regexp=COMMON_TRIGGER_PATTERN)
 def common_case(message):
     logging.info('common case has been triggered')
