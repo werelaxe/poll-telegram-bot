@@ -1,6 +1,6 @@
 class Poll:
     def __init__(self, suggestions):
-        self.suggestions = set(suggestions)
+        self.suggestions = suggestions
         self.nickname_to_choice = {}
         self.choice_to_nicknames = dict((s, []) for s in suggestions)
 
@@ -39,5 +39,5 @@ class Poll:
         return '\n'.join(lines), stat
 
     def get_title(self):
-        choices = sorted(self.suggestions)
+        choices = self.suggestions
         return 'Опрос: {} или {}?'.format(', '.join(choices[:-1]), choices[-1])
