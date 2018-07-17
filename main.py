@@ -1,3 +1,4 @@
+import sys
 import traceback
 import logging
 
@@ -92,6 +93,11 @@ def callback_inline(call):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) >= 2:
+        if sys.argv[1] == '-d':
+            logging.info('DEBUG MODE ON')
+            bot.polling(none_stop=True)
+            sys.exit(0)
     while True:
         try:
             bot.polling(none_stop=True)
