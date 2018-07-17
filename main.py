@@ -1,4 +1,5 @@
 import traceback
+import logging
 
 import telebot
 from telebot import types
@@ -11,6 +12,7 @@ from storage import Storage
 
 bot = telebot.TeleBot(BOT_TOKEN)
 polls_storage = Storage(POLLS_STORAGE_DIR)
+logging.getLogger().setLevel(logging.INFO)
 
 
 def generate_markup(message_hash, suggestions):
@@ -39,10 +41,11 @@ def send_answer_by_poll(message, new_poll):
 
 @bot.message_handler(content_types=['text'], regexp=COMMON_TRIGGER_PATTERN)
 def common_case(message):
+    logging.info('common case has been triggered')
     if message.chat.id > 0:
         bot.send_message(message.chat.id, 'Я не делаю опросы в одиночных чатах.')
         return
-    print(message.text)
+    logging.info('Handle text: "{}"'.format(message.text))
     suggestions = get_suggestions_in_common_case(message.text)
     if suggestions is None:
         return
@@ -53,21 +56,25 @@ def common_case(message):
 
 @bot.message_handler(content_types=['text'], regexp=DINNER_TIME_TRIGGER_PATTERN)
 def dinner_time_case(message):
+    logging.info('dinner time case has been triggered')
     send_answer_by_poll(message, create_new_dinner_time_poll())
 
 
 @bot.message_handler(content_types=['text'], regexp=DINNER_PLACE_TRIGGER_PATTERN)
 def dinner_place_case(message):
+    logging.info('dinner place case has been triggered')
     send_answer_by_poll(message, create_new_dinner_place_poll())
 
 
 @bot.message_handler(content_types=['text'], regexp=BREAKFAST_TIME_TRIGGER_PATTERN)
 def breakfast_time_case(message):
+    logging.info('breakfast time case has been triggered')
     send_answer_by_poll(message, create_new_breakfast_time_poll())
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
+    logging.info('callback with data: {}'.format(call.data))
     if call.message:
         poll_hash, suggestion = call.data.split(',')
         nickname = call.from_user.username
@@ -88,5 +95,7 @@ if __name__ == '__main__':
     while True:
         try:
             bot.polling(none_stop=True)
+            logging.info('bot has been restarted')
         except Exception:
             traceback.print_exc()
+            logging.info('restart after exception')
