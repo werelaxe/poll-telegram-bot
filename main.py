@@ -5,23 +5,21 @@ import logging
 import telebot
 from telebot import types
 
-from config import BOT_TOKEN, POLLS_STORAGE_DIR, CALLBACKS_STORAGE_DIR
-from message_parser import get_suggestions_in_common_case, COMMON_TRIGGER_PATTERN, BREAKFAST_TIME_TRIGGER_PATTERN, \
+from config import BOT_TOKEN
+from message_parser import get_suggestions_in_common_case, get_suggestion, COMMON_TRIGGER_PATTERN, BREAKFAST_TIME_TRIGGER_PATTERN, \
     DINNER_PLACE_TRIGGER_PATTERN, DINNER_TIME_TRIGGER_PATTERN, OLD_COMMON_TRIGGER_PATTERN
 from polls import Poll, create_new_breakfast_time_poll, create_new_dinner_place_poll, create_new_dinner_time_poll
 from storage import Storage
 
 bot = telebot.TeleBot(BOT_TOKEN)
-polls_storage = Storage(POLLS_STORAGE_DIR)
-callbacks_storage = Storage(CALLBACKS_STORAGE_DIR)
+polls_storage = Storage()
+callbacks_storage = Storage()
 logging.getLogger().setLevel(logging.DEBUG)
 
 
 def generate_markup(message_hash, suggestions):
     keyboard = types.InlineKeyboardMarkup()
     for suggestion in suggestions:
-        logging.debug("suggestion: {}".format(suggestion))
-        logging.debug("suggestion_len: {}".format(len(suggestion)))
         callback_data = message_hash, suggestion
         callback_data_hash = str(hash(callback_data))
         callbacks_storage[callback_data_hash] = callback_data
@@ -104,7 +102,9 @@ def callback_inline(call):
         poll = polls_storage.get(poll_hash)
         if poll is None:
             return
-        poll.vote(nickname, suggestion.split()[0])
+
+        poll.vote(nickname, get_suggestion(suggestion))
+        polls_storage[poll_hash] = poll
         title_suffix, stat = poll.get_results()
         bot.edit_message_text(
             chat_id=call.message.chat.id,

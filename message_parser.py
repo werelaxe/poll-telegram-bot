@@ -14,3 +14,8 @@ def get_suggestions_in_common_case(message_text):
     raw_suggestion = re.findall(COMMON_TRIGGER_PATTERN, message_text)
     if raw_suggestion:
         return [op.strip(STRIP_CHARS) for op in re.split(SEP_PATTERN, raw_suggestion[0]) if op.strip(STRIP_CHARS)]
+
+
+def get_suggestion(callback_title: str):
+    dash_index = callback_title.rfind("-")
+    return callback_title[:dash_index - 1]
