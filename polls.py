@@ -49,7 +49,7 @@ def create_new_dinner_time_poll():
 
 
 def create_new_dinner_place_poll():
-    return Poll(['Тревелерс', 'Рататуй', 'Ратскеллер', 'Столовая', 'Гастроли', 'Гады, крабы и вино'], 'Куда на обед? В ')
+    return Poll(['Тревелерс', 'Рататуй', 'Столовая', 'Гастроли', 'Гады, крабы и вино'], 'Куда на обед? В ')
 
 
 def create_new_breakfast_time_poll():
